@@ -8,7 +8,7 @@
 import Foundation
 
 struct WeatherAPI {
-    static func forecastURL(for city: String = "moscow", days: Int = 5, apiKey: String) -> URL? {
+    static func forecastURL(for city: String = "kaliningrad", days: Int = 5, apiKey: String) -> URL? {
         var components = URLComponents()
         components.scheme = "https"
         components.host = "api.weatherapi.com"
