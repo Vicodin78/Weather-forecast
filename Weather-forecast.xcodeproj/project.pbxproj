@@ -29,9 +29,22 @@
 		78EC63722DDA21B900382154 /* Weather-forecastUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Weather-forecastUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		7856F73A2DDB82E200B31CAF /* Exceptions for "Weather-forecast" folder in "Weather-forecast" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				App/Info.plist,
+			);
+			target = 78EC634E2DDA21B800382154 /* Weather-forecast */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		78EC63512DDA21B800382154 /* Weather-forecast */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				7856F73A2DDB82E200B31CAF /* Exceptions for "Weather-forecast" folder in "Weather-forecast" target */,
+			);
 			path = "Weather-forecast";
 			sourceTree = "<group>";
 		};
@@ -339,6 +352,8 @@
 		};
 		78EC637E2DDA21B900382154 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 78EC63512DDA21B800382154 /* Weather-forecast */;
+			baseConfigurationReferenceRelativePath = Config/Secrets.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -403,6 +418,8 @@
 		};
 		78EC637F2DDA21B900382154 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 78EC63512DDA21B800382154 /* Weather-forecast */;
+			baseConfigurationReferenceRelativePath = Config/Secrets.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
