@@ -10,7 +10,7 @@ import CoreData
 
 protocol CoreDataServiceProtocol {
     func saveLastWeatherLikeRawJSON(_ data: Data, completion: @escaping (Result<Void, Error>) -> Void)
-    func fetchLastWeather(completion: @escaping (Result<WeatherCache, Error>) -> Void)
+    func fetchLastWeather(completion: @escaping (Result<WeatherData, Error>) -> Void)
 }
 
 enum CoreDataServiceError: Error, LocalizedError {
@@ -72,14 +72,15 @@ final class CoreDataService: CoreDataServiceProtocol {
         }
     }
     
-    func fetchLastWeather(completion: @escaping (Result<WeatherCache, Error>) -> Void) {
+    func fetchLastWeather(completion: @escaping (Result<WeatherData, Error>) -> Void) {
         context.perform {
             let fetchRequest: NSFetchRequest<WeatherCache> = WeatherCache.fetchRequest()
             
             do {
-                if let weatherCache = try self.context.fetch(fetchRequest).first {
+                if let weatherCache = try self.context.fetch(fetchRequest).first, let data = weatherCache.jsonData {
+                    let weatherData = try JSONDecoderService.shared.decodeWeatherData(from: data)
                     DispatchQueue.main.async {
-                        completion(.success(weatherCache))
+                        completion(.success(weatherData))
                     }
                 } else {
                     DispatchQueue.main.async {
