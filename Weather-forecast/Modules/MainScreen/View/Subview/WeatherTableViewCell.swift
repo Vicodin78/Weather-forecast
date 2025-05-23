@@ -97,7 +97,7 @@ final class WeatherTableViewCell: UITableViewCell {
             dayDescriptionStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
             dayDescriptionStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
             dayDescriptionStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
-            dayDescriptionStack.widthAnchor.constraint(lessThanOrEqualToConstant: UIScreen.main.bounds.width / 2),
+            dayDescriptionStack.widthAnchor.constraint(greaterThanOrEqualToConstant: UIScreen.main.bounds.width / 2),
 
             icon.leadingAnchor.constraint(lessThanOrEqualTo: dayDescriptionStack.trailingAnchor, constant: 12),
             icon.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
@@ -111,10 +111,8 @@ final class WeatherTableViewCell: UITableViewCell {
         ])
     }
     
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-        
-        // Configure the view for the selected state
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        icon.image = nil
     }
-    
 }

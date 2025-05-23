@@ -16,6 +16,7 @@ protocol WeatherListPresenterInput {
 
 protocol WeatherListPresenterOutput: AnyObject {
     func displayWeatherData(_ data: CurrentWeatherViewModel)
+    func displayWeatherCachedData(_ data: CurrentWeatherViewModel, _ date: String)
     func displayError(_ error: Error)
 }
 
@@ -33,18 +34,7 @@ final class WeatherListPresenter: WeatherListPresenterInput {
     }
 
     func viewDidLoad() {
-        interactor.fetchWeatherData { [weak self] result in
-            guard let self else { return }
-            switch result {
-            case .fresh(let weatherData):
-                self.prepareAndTransmit(data: weatherData)
-            case .cached(let weatherData, let originalError):
-                self.prepareAndTransmit(data: weatherData)
-                self.view?.displayError(originalError)
-            case .failure(let error):
-                self.view?.displayError(error)
-            }
-        }
+        interactor.fetchWeatherData()
     }
     
     func updateWeatherList() {
@@ -56,44 +46,62 @@ final class WeatherListPresenter: WeatherListPresenterInput {
     }
     
     func model(at index: Int) -> WeatherCellViewModel {
-        cellModels[index]
+        guard cellModels.indices.contains(index) else {
+            return WeatherCellViewModel(day: "-", iconURL: "-", description: "-", temperature: "—", wind: "—", humidity: "—")
+        }
+        return cellModels[index]
     }
     
-    private func prepareAndTransmit(data: WeatherData) {
+    private func prepareViewModel(from data: WeatherData) -> CurrentWeatherViewModel {
         cellModels.removeAll()
         
-        guard let weathers = data.forecast?.forecastday else { return }
-        for weather in weathers {
-            cellModels.append(prepareData(for: weather))
+        if let weathers = data.forecast?.forecastday {
+            for weather in weathers {
+                cellModels.append(makeCellViewModel(from: weather))
+            }
         }
         
-        let currentWeather = prepareData(for: data)
-        view?.displayWeatherData(currentWeather)
+        return makeCurrentViewModel(from: data)
     }
     
-    private func prepareData(for weather: Forecastday) -> WeatherCellViewModel {
+    private func makeCellViewModel(from weather: Forecastday) -> WeatherCellViewModel {
+        let temperature = weather.day?.avgtempC.map { "\(Int($0))°" } ?? "—"
+        let wind = weather.day?.maxwindKph.map { "\(Int($0 / 3.6)) м/с" } ?? "—" //Переводим в м/с
+        let humidity = weather.day?.avghumidity.map { "\(Int($0)) 💧" } ?? "—"
+        
         return WeatherCellViewModel(
             day: weather.date ?? "-",
             iconURL: weather.day?.condition?.icon ?? "-",
             description: weather.day?.condition?.text ?? "-",
-            temperature: weather.day?.avgtempC != nil ? "\(Int(weather.day!.avgtempC!))°" : "—",
-            wind: weather.day?.maxwindKph != nil ? "\(Int(weather.day!.maxwindKph! / 3.6)) м/с" : "—", //Переводим в м/с для привычного отображения
-            humidity: weather.day?.avghumidity != nil ? "\(Int(weather.day!.avghumidity!)) 💧" : "—"
+            temperature: temperature,
+            wind: wind,
+            humidity: humidity
         )
     }
     
-    private func prepareData(for currentWeather: WeatherData) -> CurrentWeatherViewModel {
+    private func makeCurrentViewModel(from weather: WeatherData) -> CurrentWeatherViewModel {
+        let temperature = weather.current?.tempC.map { "\(Int($0))" } ?? "—"
+        
         return CurrentWeatherViewModel(
-            city: currentWeather.location?.name ?? "—",
-            iconURL: currentWeather.current?.condition?.icon ?? "",
-            description: currentWeather.current?.condition?.text ?? "—",
-            temperature: currentWeather.current?.tempC != nil ? "\(Int(currentWeather.current!.tempC!))°" : "—"
+            city: weather.location?.name ?? "—",
+            iconURL: weather.current?.condition?.icon ?? "",
+            description: weather.current?.condition?.text ?? "—",
+            temperature: temperature
         )
     }
 }
 
 // MARK: - WeatherListInteractorOutput
 extension WeatherListPresenter: WeatherListInteractorOutput {
+    
+    func displayData(_ data: WeatherData) {
+        view?.displayWeatherData(prepareViewModel(from: data))
+    }
+    
+    func displayCachedData(_ cache: WeatherCachedData) {
+        view?.displayWeatherCachedData(prepareViewModel(from: cache.data), cache.dateSaved.description)
+    }
+    
     func displayError(_ error: any Error) {
         view?.displayError(error)
     }

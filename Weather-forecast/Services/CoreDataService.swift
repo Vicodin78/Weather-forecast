@@ -8,9 +8,15 @@
 import Foundation
 import CoreData
 
+struct WeatherCachedData {
+    let id: UUID
+    let data: WeatherData
+    let dateSaved: Date
+}
+
 protocol CoreDataServiceProtocol {
     func saveLastWeatherLikeRawJSON(_ data: Data, completion: @escaping (Result<Void, Error>) -> Void)
-    func fetchLastWeather(completion: @escaping (Result<WeatherData, Error>) -> Void)
+    func fetchLastWeather(completion: @escaping (Result<WeatherCachedData, Error>) -> Void)
 }
 
 enum CoreDataServiceError: Error, LocalizedError {
@@ -72,15 +78,23 @@ final class CoreDataService: CoreDataServiceProtocol {
         }
     }
     
-    func fetchLastWeather(completion: @escaping (Result<WeatherData, Error>) -> Void) {
+    func fetchLastWeather(completion: @escaping (Result<WeatherCachedData, Error>) -> Void) {
         context.perform {
             let fetchRequest: NSFetchRequest<WeatherCache> = WeatherCache.fetchRequest()
             
             do {
-                if let weatherCache = try self.context.fetch(fetchRequest).first, let data = weatherCache.jsonData {
+                //Извлекаем кеш и разворачиваем опциональные значения
+                if let weatherCache = try self.context.fetch(fetchRequest).first,
+                   let id = weatherCache.id,
+                   let data = weatherCache.jsonData,
+                   let dateSaved = weatherCache.dateSaved
+                {
+                    //Декодируем данные и собираем в структуру
                     let weatherData = try JSONDecoderService.shared.decodeWeatherData(from: data)
+                    let result = WeatherCachedData(id: id, data: weatherData, dateSaved: dateSaved)
                     DispatchQueue.main.async {
-                        completion(.success(weatherData))
+                        //Возкращаем полученную структуру источнику запроса
+                        completion(.success(result))
                     }
                 } else {
                     DispatchQueue.main.async {

@@ -18,13 +18,17 @@ final class CurrentWeatherView: UIView {
         return $0
     }(UILabel())
     
-    private let temperature: UILabel = {
-        $0.translatesAutoresizingMaskIntoConstraints = false
-        $0.font = UIFont.systemFont(ofSize: 96, weight: .medium)
-        $0.textColor = .white
-        $0.textAlignment = .center
-        return $0
-    }(UILabel())
+    private let createTemperatureLableOrIcon: (() -> UILabel) = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.systemFont(ofSize: 96, weight: .medium)
+        label.textColor = .white
+        label.textAlignment = .center
+        return label
+    }
+    
+    private lazy var temperature = createTemperatureLableOrIcon()
+    private lazy var degreeIcon = createTemperatureLableOrIcon()
     
     private let weatherDescription: UILabel = {
         $0.translatesAutoresizingMaskIntoConstraints = false
@@ -43,7 +47,6 @@ final class CurrentWeatherView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        translatesAutoresizingMaskIntoConstraints = false
         layout()
     }
     
@@ -54,6 +57,7 @@ final class CurrentWeatherView: UIView {
     func setDataForView(from weatherData: CurrentWeatherViewModel) {
         cityName.text = weatherData.city
         temperature.text = weatherData.temperature
+        degreeIcon.text = "°"
         weatherDescription.text = weatherData.description
         ImageLoaderService.shared.loadImage(from: weatherData.iconURL) { [weak self] image in
             self?.icon.image = image
@@ -62,7 +66,7 @@ final class CurrentWeatherView: UIView {
     
     private func layout() {
         
-        [cityName, temperature, weatherDescription, icon].forEach { addSubview($0) }
+        [cityName, temperature, degreeIcon, weatherDescription, icon].forEach { addSubview($0) }
         
         let spacing: CGFloat = 8
         let iconSize: CGFloat = 60
@@ -72,7 +76,10 @@ final class CurrentWeatherView: UIView {
             cityName.centerXAnchor.constraint(equalTo: centerXAnchor),
             
             temperature.topAnchor.constraint(equalTo: cityName.bottomAnchor, constant: spacing),
-            temperature.centerXAnchor.constraint(equalTo: centerXAnchor, constant: 20),
+            temperature.centerXAnchor.constraint(equalTo: centerXAnchor),
+            
+            degreeIcon.leadingAnchor.constraint(equalTo: temperature.trailingAnchor, constant: 4),
+            degreeIcon.centerYAnchor.constraint(equalTo: temperature.centerYAnchor),
             
             weatherDescription.topAnchor.constraint(equalTo: temperature.bottomAnchor, constant: spacing),
             weatherDescription.centerXAnchor.constraint(equalTo: centerXAnchor),
