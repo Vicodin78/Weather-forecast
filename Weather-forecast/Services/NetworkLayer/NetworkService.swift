@@ -15,6 +15,7 @@ enum NetworkError: Error {
     case invalidURL
     case decodingFailed
     case isRequestInProgress
+    case defaultError
     case unknown(Error)
     
     var localizedDescription: String {
@@ -33,6 +34,8 @@ enum NetworkError: Error {
             return "Ошибка обработки данных"
         case .isRequestInProgress:
             return "Запрос уже выполняется"
+        case .defaultError:
+            return "Что-то пошло не так при получении данных"
         case .unknown(let error):
             return error.localizedDescription
         }
@@ -40,7 +43,7 @@ enum NetworkError: Error {
 }
 
 protocol NetworkServiceProtocol {
-    func fetchWeatherData(completion: @escaping (Result<WeatherData, Error>) -> Void)
+    func fetchWeatherData(completion: @escaping (Result<WeatherData, NetworkError>) -> Void)
 }
 
 final class NetworkService: NetworkServiceProtocol {
@@ -70,7 +73,7 @@ final class NetworkService: NetworkServiceProtocol {
     private var isRequestInProgress = false
     private let requestQueue = DispatchQueue(label: "NetworkService.requestQueue", attributes: .concurrent)
     
-    func fetchWeatherData(completion: @escaping (Result<WeatherData, Error>) -> Void) {
+    func fetchWeatherData(completion: @escaping (Result<WeatherData, NetworkError>) -> Void) {
         guard !isRequestInProgress else {
             completeOnMain(.failure(NetworkError.isRequestInProgress), completion: completion)
             return
@@ -111,7 +114,7 @@ final class NetworkService: NetworkServiceProtocol {
         }.resume()
     }
     
-    private func completeOnMain<T>(_ result: Result<T, Error>, completion: @escaping (Result<T, Error>) -> Void) {
+    private func completeOnMain<T>(_ result: Result<T, NetworkError>, completion: @escaping (Result<T, NetworkError>) -> Void) {
         DispatchQueue.main.async {
             completion(result)
         }
