@@ -56,21 +56,22 @@ final class WeatherListPresenter: WeatherListPresenterInput {
         cellModels.removeAll()
         
         if let weathers = data.forecast?.forecastday {
-            for weather in weathers {
-                cellModels.append(makeCellViewModel(from: weather))
+            for (index, weather) in weathers.enumerated() {
+                let dayLabel = index == 0 ? "Сегодня" : dayName(for: weather.date)
+                cellModels.append(makeCellViewModel(from: weather, with: dayLabel))
             }
         }
         
         return makeCurrentViewModel(from: data)
     }
     
-    private func makeCellViewModel(from weather: Forecastday) -> WeatherCellViewModel {
+    private func makeCellViewModel(from weather: Forecastday, with dayLabel: String) -> WeatherCellViewModel {
         let temperature = weather.day?.avgtempC.map { "\(Int($0))°" } ?? "—"
         let wind = weather.day?.maxwindKph.map { "\(Int($0 / 3.6)) м/с" } ?? "—" //Переводим в м/с
         let humidity = weather.day?.avghumidity.map { "\(Int($0)) 💧" } ?? "—"
         
         return WeatherCellViewModel(
-            day: weather.date ?? "-",
+            day: dayLabel,
             iconURL: weather.day?.condition?.icon ?? "-",
             description: weather.day?.condition?.text ?? "-",
             temperature: temperature,
@@ -89,17 +90,53 @@ final class WeatherListPresenter: WeatherListPresenterInput {
             temperature: temperature
         )
     }
+    
+    private func formatDate(_ date: Date) -> String {
+        let calendar = Calendar.current
+        
+        if calendar.isDateInToday(date) {
+            // Готовим для вью только время
+            let formatter = DateFormatter()
+            formatter.dateFormat = "HH:mm"
+            return formatter.string(from: date).description
+        } else {
+            // Дата + время
+            let formatter = DateFormatter()
+            formatter.dateFormat = "dd.MM.yyyy HH:mm"
+            return formatter.string(from: date).description
+        }
+    }
+    
+    private func dayName(for dateString: String?) -> String {
+        guard let dateString = dateString else { return "-" }
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        dateFormatter.locale = Locale(identifier: "ru_RU")
+
+        guard let date = dateFormatter.date(from: dateString) else { return "-" }
+
+        let shortWeekdayFormatter = DateFormatter()
+        shortWeekdayFormatter.locale = Locale(identifier: "ru_RU")
+        shortWeekdayFormatter.dateFormat = "EE" // краткое название: Пн, Вт, Ср
+
+        return shortWeekdayFormatter.string(from: date)
+    }
 }
 
 // MARK: - WeatherListInteractorOutput
 extension WeatherListPresenter: WeatherListInteractorOutput {
     
     func displayData(_ data: WeatherData) {
-        view?.displayWeatherData(prepareViewModel(from: data))
+        let data = prepareViewModel(from: data)
+        view?.displayWeatherData(data)
     }
     
     func displayCachedData(_ cache: WeatherCachedData) {
-        view?.displayWeatherCachedData(prepareViewModel(from: cache.data), cache.dateSaved.description)
+        let data = prepareViewModel(from: cache.data)
+        let dateSaved = formatDate(cache.dateSaved)
+        
+        view?.displayWeatherCachedData(data, dateSaved)
     }
     
     func displayError(_ error: any Error) {

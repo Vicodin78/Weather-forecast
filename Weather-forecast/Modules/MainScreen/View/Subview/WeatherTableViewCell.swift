@@ -26,7 +26,7 @@ final class WeatherTableViewCell: UITableViewCell {
     
     private let weatherDescription: UILabel = {
         $0.translatesAutoresizingMaskIntoConstraints = false
-        $0.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        $0.font = UIFont.systemFont(ofSize: 14, weight: .regular)
         $0.textColor = .white
         $0.textAlignment = .center
         $0.numberOfLines = 1
