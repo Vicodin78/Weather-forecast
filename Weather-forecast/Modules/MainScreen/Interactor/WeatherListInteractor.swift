@@ -23,6 +23,10 @@ final class WeatherListInteractor: WeatherListInteractorInput {
     var networkService: NetworkServiceProtocol?
     var coreDataService: CoreDataServiceProtocol?
     
+    // Период времени когда кэш считается актуальным = 10 минут (600 секунд)
+    private let cacheExpirationInterval: TimeInterval = 600
+    
+    // Переменные для повторного запроса данных в случае ошибки
     private let maxRetryAttempts = 5
     private let retryDelay = 3 // секунды
     private var numberOfAttempts = 0
@@ -48,9 +52,13 @@ final class WeatherListInteractor: WeatherListInteractorInput {
                 print("WeatherListInteractor отсутствует.")
                 return
             }
-            
             switch result {
             case .success(let cachedData):
+//                if self.isCacheFresh(cachedData.dateSaved) {
+//                    self.presenter?.displayData(cachedData.data)
+//                } else {
+//                    self.presenter?.displayCachedData(cachedData)
+//                }
                 self.presenter?.displayCachedData(cachedData)
             case .failure(let coreDataError):
                 presenter?.displayError(coreDataError)
@@ -86,5 +94,9 @@ final class WeatherListInteractor: WeatherListInteractorInput {
             // Если все попытки неудачны, выводим дефолтную ошибку
             presenter?.displayError(NetworkError.defaultError)
         }
+    }
+    
+    private func isCacheFresh(_ dateSaved: Date) -> Bool {
+        return Date().timeIntervalSince(dateSaved) < cacheExpirationInterval
     }
 }

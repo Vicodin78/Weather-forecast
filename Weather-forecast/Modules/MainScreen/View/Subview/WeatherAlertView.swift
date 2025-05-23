@@ -51,21 +51,27 @@ final class WeatherAlertView: UIView {
     
     private func setupLayout() {
         
-        [titleLabel, messageLabel].forEach { addSubview($0) }
+        let stackView = UIStackView(arrangedSubviews: [titleLabel, messageLabel])
+        stackView.axis = .horizontal
+        stackView.spacing = 6
+        stackView.alignment = .center
+        stackView.distribution = .fillProportionally
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        
+        addSubview(stackView)
         
         let constraintsArray = [
-            titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 8),
-            titleLabel.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor, constant: 20),
-            titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -8),
+            stackView.topAnchor.constraint(equalTo: topAnchor, constant: 8),
+            stackView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -8),
+            stackView.centerXAnchor.constraint(equalTo: centerXAnchor),
+            stackView.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor, constant: 20),
+            stackView.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor, constant: -20),
             
-            messageLabel.topAnchor.constraint(equalTo: topAnchor, constant: 8),
-            messageLabel.leadingAnchor.constraint(equalTo: titleLabel.trailingAnchor, constant: 6),
-            messageLabel.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor, constant: -20),
-            messageLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -8)
+            collapsedHeightConstraint
         ]
         
         constraintsArray.forEach { $0.priority = .defaultHigh }
-        collapsedHeightConstraint.priority = UILayoutPriority(rawValue: 999)
+        collapsedHeightConstraint.priority = UILayoutPriority(999)
         
         NSLayoutConstraint.activate([collapsedHeightConstraint])
         NSLayoutConstraint.activate(constraintsArray)
