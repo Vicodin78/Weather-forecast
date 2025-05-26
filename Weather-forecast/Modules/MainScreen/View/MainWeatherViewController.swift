@@ -15,7 +15,6 @@ final class MainWeatherViewController: UIViewController, WeatherListPresenterOut
     
     private lazy var errorView: WeatherErrorView = {
         $0.translatesAutoresizingMaskIntoConstraints = false
-        $0.onRetry = self.presenter.updateWeatherList
         return $0
     }(WeatherErrorView())
     

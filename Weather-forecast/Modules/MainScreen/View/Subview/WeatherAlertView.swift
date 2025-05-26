@@ -44,7 +44,7 @@ final class WeatherAlertView: UIView {
         backgroundColor = .orange.withAlphaComponent(0.1)
         layer.cornerRadius = 16
         layer.borderWidth = 2
-        layer.borderColor = UIColor.orange.withAlphaComponent(0.3).cgColor
+        layer.borderColor = UIColor.orange.withAlphaComponent(0.13).cgColor
     }
     
     private lazy var collapsedHeightConstraint = heightAnchor.constraint(lessThanOrEqualToConstant: 0)
