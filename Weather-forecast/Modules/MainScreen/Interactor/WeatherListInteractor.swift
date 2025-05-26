@@ -12,8 +12,8 @@ protocol WeatherListInteractorInput {
 }
 
 protocol WeatherListInteractorOutput: AnyObject {
-    func displayData(_ data: WeatherData)
-    func displayCachedData(_ data: WeatherCachedData)
+    func displayFreshData(_ data: WeatherData)
+    func displayCachedData(_ data: WeatherCachedData, silently: Bool)
     func displayError(_ error: Error)
 }
 
@@ -27,18 +27,20 @@ final class WeatherListInteractor: WeatherListInteractorInput {
     private let cacheExpirationInterval: TimeInterval = 600
     
     // Переменные для повторного запроса данных в случае ошибки
-    private let maxRetryAttempts = 5
+    private let maxRetryAttempts = 3
     private let retryDelay = 3 // секунды
     private var numberOfAttempts = 0
     
     func fetchWeatherData() {
+        fetchCachedData()
+        
         networkService?.fetchWeatherData { [weak self] result in
             guard let self else { return }
             
             switch result {
             case .success(let data):
                 // data Сохраняется в кэш внутри NetworkService
-                self.presenter?.displayData(data)
+                self.presenter?.displayFreshData(data)
                 self.numberOfAttempts = 0
             case .failure(let error):
                 self.errorHandling(for: error)
@@ -46,53 +48,63 @@ final class WeatherListInteractor: WeatherListInteractorInput {
         }
     }
     
-    private func fetchDataFromCache() {
+    private func fetchCachedData() {
         coreDataService?.fetchLastWeather { [weak self] result in
             guard let self else {
-                print("WeatherListInteractor отсутствует.")
+                print("WeatherListInteractor деинициализирован")
                 return
             }
+            
             switch result {
             case .success(let cachedData):
-//                if self.isCacheFresh(cachedData.dateSaved) {
-//                    self.presenter?.displayData(cachedData.data)
-//                } else {
-//                    self.presenter?.displayCachedData(cachedData)
-//                }
-                self.presenter?.displayCachedData(cachedData)
+                self.processCachedData(cachedData)
             case .failure(let coreDataError):
-                presenter?.displayError(coreDataError)
+                self.presenter?.displayError(coreDataError)
             }
         }
+    }
+    
+    private func processCachedData(_ cachedData: WeatherCachedData) {
+        let isFreshCache = isCacheFresh(cachedData.dateSaved)
+        let isFirstAttempt = numberOfAttempts == 0
+        
+        let shouldSendSilently = isFreshCache && isFirstAttempt
+        
+        presenter?.displayCachedData(cachedData, silently: shouldSendSilently)
+        // Если кеш свежий и это не последняя попытка получить данные из сети отправляем его тихо (без уведомления), если нет - с уведомлением
     }
     
     private func errorHandling(for error: NetworkError) {
         switch error {
-        case .invalidURL, .decodingFailed:
-            presenter?.displayError(NetworkError.defaultError)
         case .isRequestInProgress:
             break
+        case .invalidURL, .decodingFailed:
+            presenter?.displayError(NetworkError.defaultError)
         case .unknown(let unknownError):
             presenter?.displayError(unknownError)
-        default:
-            presenter?.displayError(error)
-            retryRequest()
+        case .invalidResponse,
+            .noInternetConnection,
+            .serverUnavailable,
+            .timeout,
+            .defaultError:
+            
+            handleRetryOrFail(with: error)
+        }
+    }
+    
+    private func handleRetryOrFail(with error: NetworkError) {
+        if numberOfAttempts < maxRetryAttempts {
+            retryRequest() // Начинаем фоновую повторную попытку загрузки данных из сети
+        } else {
+            presenter?.displayError(error) // Если все попытки неудачны, выводим ошибку
+            numberOfAttempts = 0
         }
     }
     
     private func retryRequest() {
-        // Показываем пользователю данные из кеша как временное решение
-        fetchDataFromCache()
-        
-        // Начинаем фоновую повторную попытку загрузки данных из сети
-        if numberOfAttempts < maxRetryAttempts {
-            numberOfAttempts += 1
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(numberOfAttempts * retryDelay)) {
-                self.fetchWeatherData()
-            }
-        } else {
-            // Если все попытки неудачны, выводим дефолтную ошибку
-            presenter?.displayError(NetworkError.defaultError)
+        numberOfAttempts += 1
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(numberOfAttempts * retryDelay)) {
+            self.fetchWeatherData()
         }
     }
     

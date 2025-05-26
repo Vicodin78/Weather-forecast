@@ -16,7 +16,9 @@ protocol WeatherListPresenterInput {
 
 protocol WeatherListPresenterOutput: AnyObject {
     func displayWeatherData(_ data: CurrentWeatherViewModel)
-    func displayWeatherCachedData(_ data: CurrentWeatherViewModel, _ date: String)
+    
+    func displayCachedData(_ data: CurrentWeatherViewModel)
+    func displayOutdatedCacheAlert(_ date: String)
     func displayError(_ error: Error)
 }
 
@@ -38,7 +40,7 @@ final class WeatherListPresenter: WeatherListPresenterInput {
     }
     
     func updateWeatherList() {
-        viewDidLoad()
+        interactor.fetchWeatherData()
     }
     
     func numberOfRows() -> Int {
@@ -127,16 +129,19 @@ final class WeatherListPresenter: WeatherListPresenterInput {
 // MARK: - WeatherListInteractorOutput
 extension WeatherListPresenter: WeatherListInteractorOutput {
     
-    func displayData(_ data: WeatherData) {
+    func displayFreshData(_ data: WeatherData) {
         let data = prepareViewModel(from: data)
         view?.displayWeatherData(data)
     }
     
-    func displayCachedData(_ cache: WeatherCachedData) {
+    func displayCachedData(_ cache: WeatherCachedData, silently: Bool) {
         let data = prepareViewModel(from: cache.data)
-        let dateSaved = formatDate(cache.dateSaved)
+        view?.displayCachedData(data)
         
-        view?.displayWeatherCachedData(data, dateSaved)
+        if !silently {
+            let dateSaved = formatDate(cache.dateSaved)
+            view?.displayOutdatedCacheAlert(dateSaved)
+        }
     }
     
     func displayError(_ error: any Error) {

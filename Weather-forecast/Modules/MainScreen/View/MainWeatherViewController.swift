@@ -49,6 +49,8 @@ final class MainWeatherViewController: UIViewController, WeatherListPresenterOut
     override func viewDidLoad() {
         super.viewDidLoad()
         presenter.viewDidLoad()
+        alertView.hideView()
+        errorView.hideView()
         layout()
         subscribeToNotification()
     }
@@ -70,11 +72,13 @@ final class MainWeatherViewController: UIViewController, WeatherListPresenterOut
         tableView.reloadData()
     }
     
-    func displayWeatherCachedData(_ data: CurrentWeatherViewModel, _ date: String) {
+    func displayCachedData(_ data: CurrentWeatherViewModel) {
         currentWeatherView.setDataForView(from: data)
-        alertView.configureAndShowView(with: date)
-        refreshControl.endRefreshing()
         tableView.reloadData()
+    }
+    
+    func displayOutdatedCacheAlert(_ date: String) {
+        alertView.configureAndShowView(with: date)
     }
     
     func displayError(_ error: any Error) {
@@ -83,6 +87,7 @@ final class MainWeatherViewController: UIViewController, WeatherListPresenterOut
     }
     
     private func layout() {
+        
         [errorView, currentWeatherView, alertView, tableView].forEach { view.addSubview($0) }
         
         NSLayoutConstraint.activate([
