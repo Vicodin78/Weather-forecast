@@ -55,22 +55,29 @@ final class WeatherErrorView: UIView {
     private lazy var collapsedHeightConstraint = heightAnchor.constraint(lessThanOrEqualToConstant: 0)
     
     private func setupLayout() {
+        
+        //Общие размеры и отсутпы
+        let iconSize: CGFloat = 40
+        let horizontalSpacing: CGFloat = 20
+        let verticalSpacing: CGFloat = 16
+        let interItemSpacing: CGFloat = 8
+        
         [iconImageView, titleLabel, messageLabel].forEach { addSubview($0) }
         
         let constraintsArray = [
             iconImageView.centerXAnchor.constraint(equalTo: centerXAnchor),
-            iconImageView.topAnchor.constraint(equalTo: topAnchor, constant: 8),
-            iconImageView.heightAnchor.constraint(equalToConstant: 40),
-            iconImageView.widthAnchor.constraint(equalToConstant: 40),
+            iconImageView.topAnchor.constraint(equalTo: topAnchor, constant: verticalSpacing),
+            iconImageView.heightAnchor.constraint(equalToConstant: iconSize),
+            iconImageView.widthAnchor.constraint(equalToConstant: iconSize),
             
-            titleLabel.topAnchor.constraint(equalTo: iconImageView.bottomAnchor, constant: 8),
-            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
-            titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
+            titleLabel.topAnchor.constraint(equalTo: iconImageView.bottomAnchor, constant: interItemSpacing),
+            titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: horizontalSpacing),
+            titleLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -horizontalSpacing),
             
-            messageLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
-            messageLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
-            messageLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
-            messageLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -16)
+            messageLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: interItemSpacing),
+            messageLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: horizontalSpacing),
+            messageLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -horizontalSpacing),
+            messageLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -verticalSpacing)
         ]
         
         constraintsArray.forEach { $0.priority = .defaultHigh }

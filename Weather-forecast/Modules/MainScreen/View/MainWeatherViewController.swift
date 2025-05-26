@@ -87,26 +87,31 @@ final class MainWeatherViewController: UIViewController, WeatherListPresenterOut
     
     private func layout() {
         
+        //Общие размеры и отсутпы
+        let horizontalSpacing: CGFloat = 16
+        let verticalSpacing: CGFloat = 16
+        let interItemSpacing: CGFloat = 16
+        
         [errorView, currentWeatherView, alertView, tableView].forEach { view.addSubview($0) }
         
         NSLayoutConstraint.activate([
             
-            errorView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            errorView.topAnchor.constraint(lessThanOrEqualTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-            errorView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+            errorView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: horizontalSpacing),
+            errorView.topAnchor.constraint(lessThanOrEqualTo: view.safeAreaLayoutGuide.topAnchor, constant: verticalSpacing),
+            errorView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -horizontalSpacing),
             
-            currentWeatherView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            currentWeatherView.topAnchor.constraint(equalTo: errorView.bottomAnchor, constant: 16),
-            currentWeatherView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+            currentWeatherView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: horizontalSpacing),
+            currentWeatherView.topAnchor.constraint(equalTo: errorView.bottomAnchor, constant: interItemSpacing),
+            currentWeatherView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -horizontalSpacing),
             
-            alertView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            alertView.topAnchor.constraint(equalTo: currentWeatherView.bottomAnchor, constant: 8),
-            alertView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+            alertView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: horizontalSpacing),
+            alertView.topAnchor.constraint(equalTo: currentWeatherView.bottomAnchor, constant: interItemSpacing/2),
+            alertView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -horizontalSpacing),
             
             tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            tableView.topAnchor.constraint(equalTo: alertView.bottomAnchor, constant: 16),
+            tableView.topAnchor.constraint(equalTo: alertView.bottomAnchor, constant: interItemSpacing),
             tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16)
+            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -verticalSpacing)
         ])
     }
     

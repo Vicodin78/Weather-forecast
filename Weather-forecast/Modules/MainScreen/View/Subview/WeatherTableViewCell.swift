@@ -76,6 +76,13 @@ final class WeatherTableViewCell: UITableViewCell {
     
     private func layout() {
         
+        //Общие размеры и отсутпы
+        let iconSize: CGFloat = 32
+        let horizontalSpacing: CGFloat = 16
+        let verticalSpacing: CGFloat = 8
+        let interItemSpacing: CGFloat = 12
+        
+        
         let dayDescriptionStack = UIStackView(arrangedSubviews: [day, weatherDescription])
         dayDescriptionStack.axis = .vertical
         dayDescriptionStack.spacing = 4
@@ -84,7 +91,7 @@ final class WeatherTableViewCell: UITableViewCell {
         
         let metricsStack = UIStackView(arrangedSubviews: [temperature, wind, humidity])
         metricsStack.axis = .horizontal
-        metricsStack.spacing = 12
+        metricsStack.spacing = interItemSpacing
         metricsStack.translatesAutoresizingMaskIntoConstraints = false
         metricsStack.alignment = .trailing
         
@@ -94,19 +101,19 @@ final class WeatherTableViewCell: UITableViewCell {
         [dayDescriptionStack, icon, metricsStack].forEach { contentView.addSubview($0) }
         
         NSLayoutConstraint.activate([
-            dayDescriptionStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            dayDescriptionStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
-            dayDescriptionStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
+            dayDescriptionStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: horizontalSpacing),
+            dayDescriptionStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: verticalSpacing),
+            dayDescriptionStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -verticalSpacing),
             dayDescriptionStack.widthAnchor.constraint(greaterThanOrEqualToConstant: UIScreen.main.bounds.width / 2),
 
-            icon.leadingAnchor.constraint(lessThanOrEqualTo: dayDescriptionStack.trailingAnchor, constant: 12),
+            icon.leadingAnchor.constraint(lessThanOrEqualTo: dayDescriptionStack.trailingAnchor, constant: interItemSpacing),
             icon.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             icon.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            icon.widthAnchor.constraint(equalToConstant: 32),
-            icon.heightAnchor.constraint(equalToConstant: 32),
+            icon.widthAnchor.constraint(equalToConstant: iconSize),
+            icon.heightAnchor.constraint(equalToConstant: iconSize),
 
-            metricsStack.leadingAnchor.constraint(lessThanOrEqualTo: icon.trailingAnchor, constant: 12),
-            metricsStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            metricsStack.leadingAnchor.constraint(lessThanOrEqualTo: icon.trailingAnchor, constant: interItemSpacing),
+            metricsStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -horizontalSpacing),
             metricsStack.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
         ])
     }

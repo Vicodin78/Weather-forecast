@@ -51,9 +51,14 @@ final class WeatherAlertView: UIView {
     
     private func setupLayout() {
         
+        //Общие размеры и отсутпы
+        let horizontalSpacing: CGFloat = 20
+        let verticalSpacing: CGFloat = 8
+        let interItemSpacing: CGFloat = 6
+        
         let stackView = UIStackView(arrangedSubviews: [titleLabel, messageLabel])
         stackView.axis = .horizontal
-        stackView.spacing = 6
+        stackView.spacing = interItemSpacing
         stackView.alignment = .center
         stackView.distribution = .fillProportionally
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -61,11 +66,11 @@ final class WeatherAlertView: UIView {
         addSubview(stackView)
         
         let constraintsArray = [
-            stackView.topAnchor.constraint(equalTo: topAnchor, constant: 8),
-            stackView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -8),
+            stackView.topAnchor.constraint(equalTo: topAnchor, constant: verticalSpacing),
+            stackView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -verticalSpacing),
             stackView.centerXAnchor.constraint(equalTo: centerXAnchor),
-            stackView.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor, constant: 20),
-            stackView.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor, constant: -20),
+            stackView.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor, constant: horizontalSpacing),
+            stackView.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor, constant: -horizontalSpacing),
             
             collapsedHeightConstraint
         ]

@@ -68,27 +68,29 @@ final class CurrentWeatherView: UIView {
         
         [cityName, temperature, degreeIcon, weatherDescription, icon].forEach { addSubview($0) }
         
-        let spacing: CGFloat = 8
+        //Общие размеры и отсутпы
+        let verticalSpacing: CGFloat = 16
+        let interItemSpacing: CGFloat = 8
         let iconSize: CGFloat = 60
         
         NSLayoutConstraint.activate([
-            cityName.topAnchor.constraint(equalTo: topAnchor, constant: 16),
+            cityName.topAnchor.constraint(equalTo: topAnchor, constant: verticalSpacing),
             cityName.centerXAnchor.constraint(equalTo: centerXAnchor),
             
-            temperature.topAnchor.constraint(equalTo: cityName.bottomAnchor, constant: spacing),
+            temperature.topAnchor.constraint(equalTo: cityName.bottomAnchor, constant: interItemSpacing),
             temperature.centerXAnchor.constraint(equalTo: centerXAnchor),
             
             degreeIcon.leadingAnchor.constraint(equalTo: temperature.trailingAnchor, constant: 4),
             degreeIcon.centerYAnchor.constraint(equalTo: temperature.centerYAnchor),
             
-            weatherDescription.topAnchor.constraint(equalTo: temperature.bottomAnchor, constant: spacing),
+            weatherDescription.topAnchor.constraint(equalTo: temperature.bottomAnchor, constant: interItemSpacing),
             weatherDescription.centerXAnchor.constraint(equalTo: centerXAnchor),
             
-            icon.topAnchor.constraint(equalTo: weatherDescription.bottomAnchor, constant: spacing),
+            icon.topAnchor.constraint(equalTo: weatherDescription.bottomAnchor, constant: interItemSpacing),
             icon.widthAnchor.constraint(equalToConstant: iconSize),
             icon.heightAnchor.constraint(equalToConstant: iconSize),
             icon.centerXAnchor.constraint(equalTo: centerXAnchor),
-            icon.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -16)
+            icon.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -verticalSpacing)
         ])
     }
 }
